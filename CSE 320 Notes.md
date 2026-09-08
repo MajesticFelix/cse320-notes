@@ -75,3 +75,50 @@
 - Big Idea: The memory hierarchy creates a large pool of storage that costs as much as the cheap storage near the bottom, but that serves data to programs at the rate of the fast storage near the top.
 - **Exploiting TEMPORAL AND SPATIAL LOCALITY!!!**
 
+# Caches
+
+### Caches
+- See definition above
+- Caches - Smaller, faster, more expensive memory caches a subset of the blocks
+- Memory - larger slower, cheaper memory viewed as partitioned into "blocks"
+
+### Cache Memories
+- Small, fast SRAM-based memories managed automatically in hardware
+- CPU looks first for data in cache
+
+### Cache Architectures:
+- Direct Mapped
+	- Every address in RAM has 1 cached block that it can use
+	- Lines = 1
+- Fully Associative
+	- "No assigned seats"
+	- Any RAM address can be stored in any cache block
+	- Sets = 1
+- Set-Associative (Basically the compromise between the two above)
+	- Every address in RAM has 1 cache set that it can use
+	- Middle ground idea
+
+### General Cache Organization (S. E. B.)
+- Cache Size: C = S * E * B data bytes
+- Blocks = S * E
+- ![[Pasted image 20260908155304.png]]
+- ![[Pasted image 20260908162227.png|210]]
+- Block offset and set index = where the word is
+- Tag = checks if the contents are correct
+- E-way Set associative cache
+	- E = the number of lines
+- Block = even | odd
+
+### Writes
+- Copies of Data: L1, L2, L3, Main Memory, Disk
+- Write-hit:
+	- Write-through (write immediately to memory)
+	- Write-back (defer write to memory until replacement of line)
+		- Need a dirty bit (line different from memory or not)
+- Write-miss:
+	- Write-allocate (load into cache, update line in cache)
+		- Good if more writes to the location follow
+	- No-write-allocate (writes straight to memory, does not load into cache)
+- Typical:
+	- Write-through + No-write-allocate
+	- **Write-back + Write-allocate**
