@@ -115,6 +115,11 @@
 	- Write-through (write immediately to memory)
 	- Write-back (defer write to memory until replacement of line)
 		- Need a dirty bit (line different from memory or not)
+		- Higher performing than write through
+		- Three events to trigger
+			1. Explicitly say to do a write back
+			2. operating system has switched process for you and forced a write back
+			3. Eviction (program uses all the cache so blocks gotta be evicted, thus initiating write backs)
 - Write-miss:
 	- Write-allocate (load into cache, update line in cache)
 		- Good if more writes to the location follow
@@ -122,3 +127,90 @@
 - Typical:
 	- Write-through + No-write-allocate
 	- **Write-back + Write-allocate**
+
+### Cache Eviction
+- Replacement strategy - removing cache data to make space for new data
+- No decision for direct mapped cache
+- Need to decide for set-assoicative cache
+- Different policies that exist:
+	- Optimal/Clairvoyant - kinda acts like a benchmark but not a good strategy for IRL
+		- Not a good strat because it's literally impossible to implement in the real world; it requires knowing of the future 
+	- Random
+	- First-in First-out (FIFO)
+		- Timestamp the block loading, pick the oldest
+		- Not a very good strat (but still solid) because oldest block might also be your most used block (might actually be the program itself)
+	- Least Recently Used (LRU)
+		- Timestamp the block access, pick the oldest
+		- Better caching than FIFO but you are paying a heavy costs on cache hits
+			- Different than FIFO since you are marking and updating the timestamp
+			- Expensive since it's not just a read, but also requires a write to reorder the data
+	- Least Frequently Used (LFU)
+		- Count the number of accesses to a line
+		- Similar to LRU but a little bit less precise
+
+### Intel Core i7 Cache Hierarchy
+- L1 i-cache & d-cache:
+	- 32 KB,  8-way, 
+	- Access: 4 cycles
+- L2 unified cache:
+	- 256 KB, 8-way, 
+	- Access: 10 cycles
+- L3 unified cache:
+	- 8 MB, 16-way,
+	- Access: 40-75 cycles
+- Block size: 
+	- Always 64 bytes
+- ![[Pasted image 20260910160508.png]]
+
+### Cache Performance Metrics
+- Miss Rate
+	- **Why track Miss Rate than Hit Rate?**
+		- Hit Rate usually has higher numbers and Miss Rates are lower. I guess Miss Rates are more attractive
+		- Consider:
+			- Cache hit time of 1 cycle
+			- miss penalty of 100 cycles
+		- Average access time:
+			- 97% hits: 1 cycle + 0.03 * 100 cycles = 4 cycles
+			- 99% hits: 1 cycle + 0.01 * 100 cycles = 2 cycles
+		- Miss rate reveals the real-world impact. Miss rate from 3% to 1% is 3x reduction. A much more attractive number.
+	- Typical numbers:
+		- 3-10% for L1
+		- can be quite small (e.g. < 1%) for L2, depending on size, etc.
+- Hit Time
+	- The amount of time to deliver a line in the cache to the processor
+		- includes time to determine whether the line is in the cache
+	- Typical numbers:
+		- 4 clock cycle for L1
+		- 10 clock cycles for L2
+- Miss Penalty
+	- Additional time required because of a miss
+		- typically 50-200 cycles for main memory (Trend: increasing!)
+
+### Writing Cache Friendly Code
+- Make common case go fast
+	- Focus on inner loops of the core functions
+- Minimize the misses in the inner loops
+	- Repeated references to variables are good (temporal locality)
+	- Stride-1 ("means your program accesses contiguous memory locations one immediately after the other") reference patterns are good (spatial locality)
+- **Key idea: Our qualitative notion of locality is quantified through our understanding of cache memories**
+
+### The Memory Mountain:
+- Taller is faster, shorter is slower to access.
+- Most cache hits occur on the ridge across the top of the mountain
+![[Pasted image 20260910161842.png]]
+
+### Matrix Multiplication
+- See slides for implementations and explanations
+- Traversing row-wise is more efficient than traversing column-wise
+	- Row-wise is more cache hits (size($a_{ij}$) / Block)
+		- So for doubles it's "miss hit hit hit" for every 4 elements
+	- Column-wise is all cache misses
+
+
+
+
+#### MT 1
+
+- All MCQs
+- **Guaranteed One question for each of: Disk allocation + Disk calculation question**
+- Some similar questions to cache simulation
